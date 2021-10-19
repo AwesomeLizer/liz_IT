@@ -3,7 +3,7 @@ from random import randrange as rnd, choice
 import time
 
 root = Tk()
-root.geometry('800x600')
+root.geometry('800x700')
 
 canv = Canvas(root, bg='black')
 canv.pack(fill=BOTH, expand=1)
@@ -16,7 +16,7 @@ def new_ball():
     фиксирующая набранное кол-во очков
     двигающая шарики
     '''
-    global x1, y1, x2, y2, x3, y3, x4, y4, r1, r2, r3, r4, o1, o2, o3, o4, text
+    global x1, y1, x2, y2, x3, y3, x4, y4, r1, r2, r3, r4, o1, o2, o3, o4, text, nap
     canv.delete(ALL)
     x1 = rnd(100, 700)
     y1 = rnd(100, 500)
@@ -36,21 +36,26 @@ def new_ball():
     o4 = canv.create_oval(x4 - r4, y4 - r4, x4 + r4, y4 + r4, fill=choice(colors), width=0)
     root.after(1000, new_ball)
     canv.delete(text)
-    text = canv.create_text(100, 50, text='Score : ' + str(sc), font='Arial 20', fill='white')
+    text = canv.create_text(100, 50, text='Счёт : ' + str(sc), font='Arial 20', fill='white')
+
 
 def move_ball():
     '''
     функция обеспечивающая движение шариков
     '''
-    global dx, dx1, dy, dy1
-    dx = rnd(0, 5)
-    dy = rnd(0, 6)
-    dx1 = rnd(0, 7)
-    dy1 = rnd(0, 8)
-    canv.move(o1, dx, dy)
-    canv.move(o2, dx, dy1)
-    canv.move(o3, dx1, dy)
-    canv.move(o4, dx, dy)
+    global o1, o2, o3, o4, x2, x1, y2, y1, y3, x3, y4, x4
+    x2 = rnd(0, 5)
+    y2 = rnd(0, 6)
+    x1 = rnd(0, 7)
+    y1 = rnd(0, 8)
+    x3 = rnd(0, 5)
+    y3 = rnd(0, 6)
+    x4 = rnd(0, 7)
+    y4 = rnd(0, 8)
+    canv.move(o1, x1, y1)
+    canv.move(o2, x2, y2)
+    canv.move(o3, x3, y3)
+    canv.move(o4, x4, y4)
     canv.after(20, move_ball)
 
 def click(event):
@@ -58,25 +63,51 @@ def click(event):
     функция ведущая подсчет очков
     бомба и обнуление
     '''
-    global sc
+    global sc, text
     a1 = ((event.x - x1) ** 2 + (event.y - y1) ** 2) ** 0.5
     a2 = ((event.x - x2) ** 2 + (event.y - y2) ** 2) ** 0.5
     a3 = ((event.x - x3) ** 2 + (event.y - y3) ** 2) ** 0.5
     a4 = ((event.x - x4) ** 2 + (event.y - y4) ** 2) ** 0.5
-    if a1 <= r1:
+    if a1 < r1:
         sc += 1
-    elif a2 <= r2:
+    elif a2 < r2:
         sc += 1
-    elif a3 <= r3:
+    elif a3 < r3:
         sc += 1
-    elif a4 <= r4:
+    elif a4 < r4:
         sc = 0
         canv.delete(ALL)
-        text = canv.create_text(200, 200, text='Score : 0. BOMB!!!', font='Arial 40', fill='red')
+        text = canv.create_text(200, 150, text='Счёт : 0. BOMB!!!', font='Arial 40', fill='red')
+        bomb()
 
-sc = 0
+def bomb():
+    '''
+    рисунок бомбы
+    '''
+    canv.create_line(350, 500, 450, 200, fill='yellow', width=3)
+    canv.create_oval(300, 400, 500, 600, fill='grey', width=0)
+    canv.create_rectangle(370, 340, 410, 410, fill='grey', width=0)
+
+def yourname():
+    global name, sc
+    root.title("ПОЙМАЙ ШАРИК")
+    label = Label(root, font=("Ubuntu", 22))
+    e = Entry(root, width=20)
+    b = Button(root, text="Сохранить мой результат")
+    e.pack()
+    b.pack()
+    name = e.get()
+    string = name + str(sc) + '\n'
+    file = open('results.txt', 'a')
+    file.write(string)
+    file.close()
+    with open('results.txt', 'a') as f:
+        f.write(string)
+
 text = 0
+sc = 0
 canv.bind('<Button-1>', click)
 new_ball()
 move_ball()
+yourname()
 root.mainloop()
