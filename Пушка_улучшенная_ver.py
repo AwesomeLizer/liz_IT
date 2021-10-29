@@ -9,6 +9,7 @@ root.geometry('800x600')
 canv = tk.Canvas(root, bg='white')
 canv.pack(fill=tk.BOTH, expand=1)
 
+
 class Ball:
     def __init__(self, x=40, y=450):
         """ Конструктор класса ball
@@ -23,21 +24,21 @@ class Ball:
         self.vy = 0
         self.color = choice(['blue', 'green', 'red', 'brown'])
         self.id = canv.create_oval(
-                self.x - self.r,
-                self.y - self.r,
-                self.x + self.r,
-                self.y + self.r,
-                fill=self.color
+            self.x - self.r,
+            self.y - self.r,
+            self.x + self.r,
+            self.y + self.r,
+            fill=self.color
         )
         self.live = 30
 
     def set_coords(self):
         canv.coords(
-                self.id,
-                self.x - self.r,
-                self.y - self.r,
-                self.x + self.r,
-                self.y + self.r
+            self.id,
+            self.x - self.r,
+            self.y - self.r,
+            self.x + self.r,
+            self.y + self.r
         )
 
     def move(self):
@@ -73,7 +74,7 @@ class Ball:
         Returns:
             Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
         """
-        d = math.sqrt((self.x - obj.x)**2 + (self.y - obj.y)**2)
+        d = math.sqrt((self.x - obj.x) ** 2 + (self.y - obj.y) ** 2)
         if d <= (self.r + obj.r):
             return True
         else:
@@ -99,7 +100,7 @@ class Gun:
         bullet += 1
         new_ball = Ball()
         new_ball.r += 5
-        self.an = math.atan((event.y-new_ball.y) / (event.x-new_ball.x))
+        self.an = math.atan((event.y - new_ball.y) / (event.x - new_ball.x))
         new_ball.vx = self.f2_power * math.cos(self.an)
         new_ball.vy = - self.f2_power * math.sin(self.an)
         balls += [new_ball]
@@ -109,7 +110,7 @@ class Gun:
     def targetting(self, event=0):
         """Прицеливание. Зависит от положения мыши."""
         if event:
-            self.an = math.atan((event.y-450) / (event.x-20))
+            self.an = math.atan((event.y - 450) / (event.x - 20))
         if self.f2_on:
             canv.itemconfig(self.id, fill='orange')
         else:
@@ -144,7 +145,7 @@ class Target2:
         y = self.y = rnd(300, 550)
         r = self.r = rnd(2, 50)
         color = self.color = 'red'
-        canv.coords(self.id, x-r, y-r, x+r, y+r)
+        canv.coords(self.id, x - r, y - r, x + r, y + r)
         canv.itemconfig(self.id, fill=color)
 
     def hit(self, points=1):
@@ -163,7 +164,8 @@ class Target2:
             if self.y + self.r > 600 or self.y - self.r <= 0:
                 self.vy = -self.vy
             canv.coords(self.id, self.x - self.r, self.y - self.r,
-                          self.x + self.r, self.y + self.r)
+                        self.x + self.r, self.y + self.r)
+
 
 class Target1:
     def __init__(self):
@@ -181,7 +183,7 @@ class Target1:
         y = self.y = rnd(300, 550)
         r = self.r = rnd(2, 50)
         color = self.color = 'red'
-        canv.coords(self.id, x-r, y-r, x+r, y+r)
+        canv.coords(self.id, x - r, y - r, x + r, y + r)
         canv.itemconfig(self.id, fill=color)
 
     def hit(self, points=1):
@@ -200,7 +202,8 @@ class Target1:
             if self.y + self.r > 600 or self.y - self.r <= 0:
                 self.vy = -self.vy
             canv.coords(self.id, self.x - self.r, self.y - self.r,
-                          self.x + self.r, self.y + self.r)
+                        self.x + self.r, self.y + self.r)
+
 
 t1 = Target1()
 t2 = Target2()
@@ -208,6 +211,7 @@ screen1 = canv.create_text(400, 300, text='', font='28')
 g1 = Gun()
 bullet = 0
 balls = []
+
 
 def new_game(event=''):
     global Gun, t1, t2, screen1, balls, bullet
@@ -246,6 +250,24 @@ def new_game(event=''):
     canv.delete(Gun)
     root.after(1, new_game)
 
-new_game()
 
+l = tk.Label(root, font=("Ubuntu", 22))
+l.pack()
+e = tk.Entry(root, width=20)
+e.pack()
+b = tk.Button(root, text="Сохранить мой результат")
+b.pack()
+
+
+def name():
+    global name1, b
+    name1 = e.get()
+
+
+b.bind('<Return>', name)
+
+new_game()
 root.mainloop()
+string = name1 + str(bullet) + '\n'
+with open('results.txt', 'a') as f:
+    f.write(string)
